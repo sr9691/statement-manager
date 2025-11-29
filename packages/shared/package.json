@@ -1,0 +1,13 @@
+{
+    "name": "@repo/shared",
+    "version": "0.0.0",
+    "private": true,
+    "main": "index.ts",
+    "dependencies": {
+        "zod": "latest"
+    },
+    "devDependencies": {
+        "typescript": "latest",
+        "@types/node": "latest"
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "@repo/config",
+    "version": "0.0.0",
+    "private": true,
+    "main": "index.js",
+    "devDependencies": {
+        "typescript": "latest",
+        "eslint": "latest",
+        "@types/node": "latest"
+    }
+}

@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  ADVISOR
+  CLIENT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      UserRole @default(CLIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  clients   ClientProfile[] // If role is ADVISOR, they manage these clients
+  clientProfile ClientProfile? @relation("ClientUser") // If role is CLIENT, this is their profile
+}
+
+model ClientProfile {
+  id        String   @id @default(uuid())
+  userId    String?  @unique
+  user      User?    @relation("ClientUser", fields: [userId], references: [id])
+  advisorId String?
+  advisor   User?    @relation(fields: [advisorId], references: [id])
+  firstName String
+  lastName  String
+  accounts  Account[]
+  invoices  Invoice[]
+}
+
+model Custodian {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  templates CustodianTemplate[]
+  accounts  Account[]
+}
+
+model CustodianTemplate {
+  id          String   @id @default(uuid())
+  custodianId String
+  custodian   Custodian @relation(fields: [custodianId], references: [id])
+  name        String
+  mapping     Json     // Stores the mapping logic (e.g., regex, coordinates)
+  createdAt   DateTime @default(now())
+}
+
+model Account {
+  id          String   @id @default(uuid())
+  clientId    String
+  client      ClientProfile @relation(fields: [clientId], references: [id])
+  custodianId String
+  custodian   Custodian @relation(fields: [custodianId], references: [id])
+  accountNumber String
+  statements  Statement[]
+}
+
+model Statement {
+  id          String   @id @default(uuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  periodStart DateTime
+  periodEnd   DateTime
+  fileUrl     String
+  status      String   // PENDING, PROCESSED, ERROR
+  data        Json?    // Parsed data (positions, transactions)
+  createdAt   DateTime @default(now())
+}
+
+model FeeSchedule {
+  id          String   @id @default(uuid())
+  name        String
+  type        String   // TIERED, FLAT, HYBRID
+  tiers       FeeTier[]
+  exceptions  FeeException[]
+}
+
+model FeeTier {
+  id            String      @id @default(uuid())
+  scheduleId    String
+  schedule      FeeSchedule @relation(fields: [scheduleId], references: [id])
+  minAum        Decimal
+  maxAum        Decimal?    // Null means infinity
+  rateBps       Decimal
+}
+
+model FeeException {
+  id            String      @id @default(uuid())
+  scheduleId    String
+  schedule      FeeSchedule @relation(fields: [scheduleId], references: [id])
+  symbol        String?
+  assetType     String?
+  rateBps       Decimal
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  clientId    String
+  client      ClientProfile @relation(fields: [clientId], references: [id])
+  periodStart DateTime
+  periodEnd   DateTime
+  totalFee    Decimal
+  status      String   // DRAFT, SENT, PAID
+  pdfUrl      String?
+  htmlContent String?
+  items       InvoiceItem[]
+  createdAt   DateTime @default(now())
+}
+
+model InvoiceItem {
+  id        String   @id @default(uuid())
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  description String
+  amount    Decimal
+}

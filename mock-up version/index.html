@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fuhrmann Capital Billing – Mock App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --color-primary: #0f1a2a;
+      --color-primary-muted: #18263b;
+      --color-text-main: #4a4f57;
+      --color-text-light: #7a7f87;
+      --color-bg: #f5f6f8;
+      --color-bg-elevated: #ffffff;
+      --color-border: #d8dadd;
+      --color-bg-soft: #eceef1;
+      --color-accent-green: #1f5e4e;
+      --color-accent-gold: #c7a557;
+      --color-error: #b3261e;
+      --color-info: #3566cc;
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --shadow-soft: 0 8px 20px rgba(15, 26, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-text-main);
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header.app-header {
+      background: var(--color-primary);
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-weight: 1200;
+      letter-spacing: 0.05em;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      font-size: 0.77rem;
+      opacity: 0.7;
+    }
+
+    .user-menu {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0.9;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c7a557, #f5f0d8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .layout {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    aside.sidebar {
+      width: 240px;
+      background: #0b1422;
+      color: #cfd3dc;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+    }
+
+    .nav-section-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin: 10px 10px 4px;
+      color: #8f95a4;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      margin: 2px 4px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #d6dae4;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .nav-item span.icon {
+      font-size: 1rem;
+      opacity: 0.8;
+      width: 18px;
+      text-align: center;
+    }
+
+    .nav-item.active {
+      background: var(--color-primary-muted);
+      color: #ffffff;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 0.75rem;
+      color: #7a8399;
+      padding: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    main.app-main {
+      flex: 1;
+      padding: 18px 24px 24px;
+      overflow-y: auto;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.18s ease-out;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .view-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 16px;
+      gap: 8px;
+    }
+
+    .view-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .view-subtitle {
+      font-size: 0.83rem;
+      color: var(--color-text-light);
+    }
+
+    .button-primary,
+    .button-ghost {
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .button-primary {
+      background: var(--color-info);
+      color: #fff;
+    }
+
+    .button-primary:hover {
+      background: #2b54aa;
+    }
+
+    .button-ghost {
+      background: transparent;
+      color: var(--color-text-light);
+      border: 1px solid var(--color-border);
+    }
+
+    .button-ghost:hover {
+      background: #f0f1f4;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .card {
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(216, 218, 221, 0.7);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .card-tag {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef1f7;
+      color: var(--color-text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-main {
+      margin-top: 2px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--color-text-light);
+      margin-top: 2px;
+    }
+
+    .metric-trend {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      color: var(--color-accent-green);
+    }
+
+    .metric-trend.neg {
+      color: var(--color-error);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    thead {
+      background: var(--color-bg-soft);
+    }
+
+    th,
+    td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--color-border);
+      text-align: left;
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--color-text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr.clickable {
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+
+    tr.clickable:hover {
+      background: #f7f8fb;
+    }
+
+    tr.selected {
+      background: #eef2fb;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #eef1f7;
+      color: var(--color-text-light);
+    }
+
+    .pill.success {
+      background: rgba(31, 94, 78, 0.12);
+      color: var(--color-accent-green);
+    }
+
+    .pill.error {
+      background: rgba(179, 38, 30, 0.08);
+      color: var(--color-error);
+    }
+
+    .pill.info {
+      background: rgba(53, 102, 204, 0.1);
+      color: var(--color-info);
+    }
+
+    .muted {
+      color: var(--color-text-light);
+      font-size: 0.8rem;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stack-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.84rem;
+    }
+
+    .stack-row strong {
+      color: var(--color-primary);
+    }
+
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-light);
+      margin-bottom: 6px;
+    }
+
+    .upload-box {
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--color-border);
+      background: var(--color-bg-soft);
+      padding: 16px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+    }
+
+    .upload-box strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--color-primary);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+
+    select,
+    input[type="file"] {
+      font-size: 0.82rem;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: #fff;
+    }
+
+    .invoice-preview {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      background: #fff;
+      padding: 16px;
+      font-size: 0.84rem;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .invoice-header {
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+
+    .invoice-header h3 {
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+    }
+
+    .invoice-meta {
+      font-size: 0.78rem;
+      color: var(--color-text-light);
+      margin-top: 2px;
+    }
+
+    .invoice-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--color-border);
+    }
+
+    .invoice-total-label {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-light);
+    }
+
+    .invoice-total-amount {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .badge-role {
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .client-summary-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      padding: 14px 16px;
+      background: #ffffff;
+    }
+
+    .client-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .client-summary-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .tag-pill {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--color-bg-soft);
+      color: var(--color-text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      font-size: 0.74rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: #fbfbfd;
+      color: var(--color-text-light);
+    }
+
+    @media (max-width: 840px) {
+      aside.sidebar {
+        display: none;
+      }
+      header.app-header {
+        padding: 10px 14px;
+      }
+      main.app-main {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-title">FUHRMANN CAPITAL</div>
+      <div class="brand-title">Billing & Custodian Statements</div>
+    </div>
+    <div class="user-menu">
+      <span class="badge-role">Advisor</span>
+      <span>Ryan Fuhrmann/span>
+      <div class="user-avatar">RF</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="nav-section-label">Navigation</div>
+      <ul class="nav-list">
+        <li class="nav-item active" data-target="view-dashboard">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </li>
+        <li class="nav-item" data-target="view-statements">
+          <span class="icon">📄</span>
+          <span>Statements</span>
+        </li>
+        <li class="nav-item" data-target="view-invoices">
+          <span class="icon">🧾</span>
+          <span>Invoices</span>
+        </li>
+        <li class="nav-item" data-target="view-client-portal">
+          <span class="icon">👤</span>
+          <span>Client Portal</span>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        Fuhrmann Capital LLC<br />
+        Q2 2025 – Mock Environment
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <!-- DASHBOARD VIEW -->
+      <section id="view-dashboard" class="view active">
+        <div class="view-header">
+          <div>
+            <div class="view-title">Advisor Dashboard</div>
+            <div class="view-subtitle">
+              Snapshot of statements, invoices, and billing for this quarter.
+            </div>
+          </div>
+          <div>
+            <button class="button-ghost" data-nav-jump="view-statements">
+              + Upload Statement
+            </button>
+            <button class="button-primary" data-nav-jump="view-invoices">
+              Run Billing
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-3" style="margin-bottom: 18px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Clients</div>
+              <span class="card-tag">Overview</span>
+            </div>
+            <div class="metric-main">142</div>
+            <div class="metric-label">Active households</div>
+            <div class="metric-trend">+6 since last quarter</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Statements Uploaded</div>
+              <span class="card-tag">Q2 2025</span>
+            </div>
+            <div class="metric-main">87</div>
+            <div class="metric-label">Custodian statements processed</div>
+            <div class="metric-trend">Schwab · Wells Fargo · Fidelity</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Draft Invoices</div>
+              <span class="card-tag">Pending</span>
+            </div>
+            <div class="metric-main">12</div>
+            <div class="metric-label">Awaiting advisor review</div>
+            <div class="metric-trend neg">3 with parsing issues</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Recent Statements</div>
+            </div>
+            <table>
+              <thead>
+              <tr>
+                <th>Client</th>
+                <th>Custodian</th>
+                <th>Account #</th>
+                <th>End Value</th>
+                <th>Status</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr class="clickable" data-statement="collings">
+                <td>Leonard L. Collings</td>
+                <td>Schwab</td>
+                <td>1498-3365</td>
+                <td>$20,328.48</td>
+                <td><span class="pill success">Parsed</span></td>
+              </tr>
+              <tr class="clickable" data-statement="benjamin">
+                <td>Benjamin, Joshua</td>
+                <td>Schwab</td>
+                <td>12236287</td>
+                <td>$53,155.00</td>
+                <td><span class="pill success">Parsed</span></td>
+              </tr>
+              <tr class="clickable" data-statement="joint">
+                <td>Benjamin Family</td>
+                <td>Schwab</td>
+                <td>25356094</td>
+                <td>$11,977.29</td>
+                <td><span class="pill info">Ready</span></td>
+              </tr>
+              <tr class="clickable" data-statement="ira-rollover">
+                <td>Benjamin, Joshua – IRA</td>
+                <td>Schwab</td>
+                <td>43383008</td>
+                <td>$17,173.14</td>
+                <td><span class="pill error">Review</span></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Selected Statement Summary</div>
+            </div>
+            <div id="statement-summary" class="stack">
+              <!-- Filled by JS on row click -->
+              <div class="muted">
+                Select a statement on the left to view parsed details.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATEMENTS VIEW -->
+      <section id="view-statements" class="view">
+        <div class="view-header">
+          <div>
+            <div class="view-title">Custodian Statements</div>
+            <div class="view-subtitle">
+              Upload new statements and review parsed data before fees are
+              calculated.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="section-label">Upload Statement</div>
+            <div class="upload-box">
+              <strong>Drag &amp; drop a PDF here</strong>
+              <span>or use the controls below (mock only – no upload)</span>
+
+              <div class="input-row">
+                <select>
+                  <option>Charles Schwab</option>
+                  <option>Wells Fargo Advisors</option>
+                  <option>Fidelity</option>
+                  <option>New custodian format…</option>
+                </select>
+                <input type="file" disabled title="Mock only" />
+                <button class="button-primary" type="button">
+                  Parse Statement
+                </button>
+              </div>
+
+              <div class="muted" style="margin-top: 8px;">
+                In production, this will feed the trainable parser for each
+                custodian format.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Parsed Snapshot (Sample)</div>
+            <div class="stack">
+              <div class="stack-row">
+                <span>Client</span>
+                <strong>Leonard L. Collings</strong>
+              </div>
+              <div class="stack-row">
+                <span>Custodian / Account</span>
+                <strong>Schwab · 1498-3365</strong>
+              </div>
+              <div class="stack-row">
+                <span>Statement Period</span>
+                <strong>Jun 1–30, 2025</strong>
+              </div>
+              <div class="stack-row">
+                <span>Beginning Value</span>
+                <strong>$21,075.59</strong>
+              </div>
+              <div class="stack-row">
+                <span>Ending Value</span>
+                <strong>$20,328.48</strong>
+              </div>
+              <div class="stack-row">
+                <span>% Equity / % Fixed Income / % Cash</span>
+                <strong>49% · 49% · 1%</strong>
+              </div>
+            </div>
+
+            <div class="section-label" style="margin-top: 12px;">
+              Holdings (Extracted)
+            </div>
+            <table>
+              <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Description</th>
+                <th>Value</th>
+                <th>Asset Class</th>
+                <th>Fee Exempt</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>GO</td>
+                <td>Grocery Outlet Hldg</td>
+                <td>$3,291.30</td>
+                <td>Equity</td>
+                <td>–</td>
+              </tr>
+              <tr>
+                <td>SFM</td>
+                <td>Sprouts Farmers Market</td>
+                <td>$4,939.20</td>
+                <td>Equity</td>
+                <td>–</td>
+              </tr>
+              <tr>
+                <td>US T-Note</td>
+                <td>US Treasury Note</td>
+                <td>$10,015.23</td>
+                <td>Fixed Income</td>
+                <td><span class="pill success">Excluded</span></td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="stack-row" style="margin-top: 8px;">
+              <span>Adjusted AUM for Billing</span>
+              <strong>$10,313.25</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INVOICES VIEW -->
+      <section id="view-invoices" class="view">
+        <div class="view-header">
+          <div>
+            <div class="view-title">Invoices</div>
+            <div class="view-subtitle">
+              Review draft invoices and preview the final layout clients will
+              receive.
+            </div>
+          </div>
+          <div>
+            <button class="button-primary" type="button">
+              Generate All Q2 Invoices
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="section-label">Draft Invoices – Q2 2025</div>
+            <table id="invoice-table">
+              <thead>
+              <tr>
+                <th>Client</th>
+                <th>Period</th>
+                <th>Total Fee</th>
+                <th>Status</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr class="clickable" data-invoice="benjamin-q2">
+                <td>Benjamin, Joshua</td>
+                <td>Q2 2025</td>
+                <td>$201.53</td>
+                <td><span class="pill info">Draft</span></td>
+              </tr>
+              <tr class="clickable" data-invoice="collings-q2">
+                <td>Leonard L. Collings</td>
+                <td>Q2 2025</td>
+                <td>$25.78</td>
+                <td><span class="pill info">Draft</span></td>
+              </tr>
+              <tr class="clickable" data-invoice="benjamin-q1">
+                <td>Benjamin, Joshua</td>
+                <td>Q1 2025</td>
+                <td>$187.40</td>
+                <td><span class="pill success">Sent</span></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Invoice Preview</div>
+            <div class="invoice-preview" id="invoice-preview">
+              <div class="muted">
+                Select an invoice on the left to preview the generated layout.
+              </div>
+            </div>
+            <div style="margin-top: 10px; display: flex; gap: 8px;">
+              <button class="button-primary" type="button">
+                Approve &amp; Lock
+              </button>
+              <button class="button-ghost" type="button">
+                Download PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLIENT PORTAL VIEW -->
+      <section id="view-client-portal" class="view">
+        <div class="view-header">
+          <div>
+            <div class="view-title">Client Portal Preview</div>
+            <div class="view-subtitle">
+              What your end clients see when they log in to view invoices and
+              statements.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="client-summary-card">
+            <div class="client-summary-header">
+              <div class="client-summary-name">Benjamin, Joshua</div>
+              <span class="tag-pill">Client View</span>
+            </div>
+            <div class="stack">
+              <div class="stack-row">
+                <span>Household AUM</span>
+                <strong>$82,305.43</strong>
+              </div>
+              <div class="stack-row">
+                <span>YTD Fees Paid</span>
+                <strong>$542.21</strong>
+              </div>
+              <div class="stack-row">
+                <span>Billing Frequency</span>
+                <strong>Quarterly</strong>
+              </div>
+            </div>
+            <div class="section-label" style="margin-top: 10px;">
+              Quick Links
+            </div>
+            <div class="chip-row">
+              <div class="chip">Download latest invoice</div>
+              <div class="chip">View statements</div>
+              <div class="chip">Year-to-date summary</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Client – Invoices</div>
+            <table>
+              <thead>
+              <tr>
+                <th>Period</th>
+                <th>Date</th>
+                <th>Total Fee</th>
+                <th>Status</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Q2 2025</td>
+                <td>06/30/2025</td>
+                <td>$201.53</td>
+                <td><span class="pill info">Available</span></td>
+              </tr>
+              <tr>
+                <td>Q1 2025</td>
+                <td>03/31/2025</td>
+                <td>$187.40</td>
+                <td><span class="pill success">Viewed</span></td>
+              </tr>
+              <tr>
+                <td>Q4 2024</td>
+                <td>12/31/2024</td>
+                <td>$173.10</td>
+                <td><span class="pill success">Viewed</span></td>
+              </tr>
+              </tbody>
+            </table>
+
+            <div class="section-label" style="margin-top: 12px;">
+              Client – Statements
+            </div>
+            <table>
+              <thead>
+              <tr>
+                <th>Custodian</th>
+                <th>Account</th>
+                <th>Period</th>
+                <th>Type</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Schwab</td>
+                <td>12236287</td>
+                <td>Q2 2025</td>
+                <td>PDF</td>
+              </tr>
+              <tr>
+                <td>Schwab</td>
+                <td>25356094</td>
+                <td>Q2 2025</td>
+                <td>PDF</td>
+              </tr>
+              <tr>
+                <td>Schwab</td>
+                <td>43383008</td>
+                <td>Q2 2025</td>
+                <td>PDF</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+  // Simple view switching
+  const navItems = document.querySelectorAll(".nav-item");
+  const views = document.querySelectorAll(".view");
+
+  function activateView(id) {
+    views.forEach((v) => v.classList.toggle("active", v.id === id));
+    navItems.forEach((item) =>
+      item.classList.toggle("active", item.dataset.target === id)
+    );
+  }
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      activateView(item.dataset.target);
+    });
+  });
+
+  // Buttons that jump to a view
+  document.querySelectorAll("[data-nav-jump]").forEach((btn) => {
+    btn.addEventListener("click", () => activateView(btn.dataset.navJump));
+  });
+
+  // Hardcoded statement summaries for dashboard
+  const statementSummaries = {
+    collings: {
+      client: "Leonard L. Collings",
+      account: "Schwab · 1498-3365",
+      period: "Jun 1–30, 2025",
+      beginning: "$21,075.59",
+      ending: "$20,328.48",
+      equitySplit: "49% Equity · 49% Fixed Income · 1% Cash",
+      adjustedAum: "$10,313.25",
+    },
+    benjamin: {
+      client: "Benjamin, Joshua",
+      account: "Schwab · 12236287",
+      period: "Q2 2025",
+      beginning: "$51,902.12",
+      ending: "$53,155.00",
+      equitySplit: "100% Equity",
+      adjustedAum: "$53,155.00",
+    },
+    joint: {
+      client: "Benjamin Family – Joint",
+      account: "Schwab · 25356094",
+      period: "Q2 2025",
+      beginning: "$11,420.81",
+      ending: "$11,977.29",
+      equitySplit: "100% Equity",
+      adjustedAum: "$11,977.29",
+    },
+    "ira-rollover": {
+      client: "Benjamin, Joshua – IRA",
+      account: "Schwab · 43383008",
+      period: "Q2 2025",
+      beginning: "$16,544.40",
+      ending: "$17,173.14",
+      equitySplit: "100% Equity",
+      adjustedAum: "$17,173.14",
+    },
+  };
+
+  const statementSummaryEl = document.getElementById("statement-summary");
+  const statementRows = document.querySelectorAll(
+    "[data-statement]"
+  );
+
+  statementRows.forEach((row) => {
+    row.addEventListener("click", () => {
+      const key = row.dataset.statement;
+      const data = statementSummaries[key];
+      if (!data) return;
+
+      statementRows.forEach((r) => r.classList.remove("selected"));
+      row.classList.add("selected");
+
+      statementSummaryEl.innerHTML = `
+        <div class="stack">
+          <div class="stack-row"><span>Client</span><strong>${data.client}</strong></div>
+          <div class="stack-row"><span>Custodian / Account</span><strong>${data.account}</strong></div>
+          <div class="stack-row"><span>Statement Period</span><strong>${data.period}</strong></div>
+          <div class="stack-row"><span>Beginning Value</span><strong>${data.beginning}</strong></div>
+          <div class="stack-row"><span>Ending Value</span><strong>${data.ending}</strong></div>
+          <div class="stack-row"><span>Allocation</span><strong>${data.equitySplit}</strong></div>
+          <div class="stack-row"><span>Adjusted AUM for Billing</span><strong>${data.adjustedAum}</strong></div>
+        </div>
+        <div class="muted" style="margin-top: 8px;">
+          This view represents the normalized data passed into the fee engine.
+        </div>
+      `;
+    });
+  });
+
+  // Hardcoded invoice previews
+  const invoiceData = {
+    "benjamin-q2": {
+      client: "BENJAMIN, JOSHUA",
+      period: "Q2 2025",
+      date: "06/30/2025",
+      lines: [
+        {
+          account: "Individual Retirement",
+          number: "12236287",
+          value: "$53,155.00",
+          equity: "100.0%",
+          equityRate: "0.2500%",
+          equityFee: "$131.51",
+          fixedRate: "0.0500%",
+          fixedFee: "$0.00",
+          subtotal: "$131.51",
+        },
+        {
+          account: "Schwab One – Joint Tenant",
+          number: "25356094",
+          value: "$11,977.29",
+          equity: "100.0%",
+          equityRate: "0.2500%",
+          equityFee: "$29.65",
+          fixedRate: "0.0500%",
+          fixedFee: "$0.00",
+          subtotal: "$29.65",
+        },
+        {
+          account: "Individual Retirement",
+          number: "43383008",
+          value: "$17,173.14",
+          equity: "100.0%",
+          equityRate: "0.2500%",
+          equityFee: "$40.37",
+          fixedRate: "0.0500%",
+          fixedFee: "$0.00",
+          subtotal: "$40.37",
+        },
+      ],
+      total: "$201.53",
+    },
+    "collings-q2": {
+      client: "LEONARD L. COLLINGS",
+      period: "Q2 2025",
+      date: "06/30/2025",
+      lines: [
+        {
+          account: "Roth IRA",
+          number: "1498-3365",
+          value: "$20,328.48",
+          equity: "49.0%",
+          equityRate: "0.2500%",
+          equityFee: "$24.87",
+          fixedRate: "0.1500%",
+          fixedFee: "$0.91",
+          subtotal: "$25.78",
+        },
+      ],
+      total: "$25.78",
+    },
+    "benjamin-q1": {
+      client: "BENJAMIN, JOSHUA",
+      period: "Q1 2025",
+      date: "03/31/2025",
+      lines: [
+        {
+          account: "Household",
+          number: "Multiple",
+          value: "$78,080.23",
+          equity: "100.0%",
+          equityRate: "0.2400%",
+          equityFee: "$187.40",
+          fixedRate: "0.0000%",
+          fixedFee: "$0.00",
+          subtotal: "$187.40",
+        },
+      ],
+      total: "$187.40",
+    },
+  };
+
+  const invoicePreviewEl = document.getElementById("invoice-preview");
+  const invoiceRows = document.querySelectorAll("[data-invoice]");
+
+  invoiceRows.forEach((row) => {
+    row.addEventListener("click", () => {
+      const key = row.dataset.invoice;
+      const data = invoiceData[key];
+      if (!data) return;
+
+      invoiceRows.forEach((r) => r.classList.remove("selected"));
+      row.classList.add("selected");
+
+      let rowsHtml = data.lines
+        .map(
+          (line) => `
+        <tr>
+          <td>${line.account}</td>
+          <td>${line.number}</td>
+          <td>${line.value}</td>
+          <td>${line.equity}</td>
+          <td>${line.equityRate}</td>
+          <td>${line.equityFee}</td>
+          <td>${line.fixedRate}</td>
+          <td>${line.fixedFee}</td>
+          <td>${line.subtotal}</td>
+        </tr>`
+        )
+        .join("");
+
+      invoicePreviewEl.innerHTML = `
+        <div class="invoice-header">
+          <h3>INVOICE – QUARTERLY INVESTMENT MANAGEMENT FEE</h3>
+          <div class="invoice-meta">
+            Client: <strong>${data.client}</strong><br />
+            Period: ${data.period} &nbsp;|&nbsp; Invoice Date: ${data.date}
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Acc #</th>
+              <th>Quarter-End Value</th>
+              <th>% Equity</th>
+              <th>Equity Fee %</th>
+              <th>Equity Fee $</th>
+              <th>FI Fee %</th>
+              <th>FI Fee $</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+        <div class="invoice-total">
+          <div class="invoice-total-label">Balance Due</div>
+          <div class="invoice-total-amount">${data.total}</div>
+        </div>
+        <div class="muted" style="margin-top: 6px;">
+          For informational purposes only. Final numbers subject to custodian
+          reconciliation.
+        </div>
+      `;
+    });
+  });
+</script>
+</body>
+</html>
